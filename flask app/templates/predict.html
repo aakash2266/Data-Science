@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Predict - Regression App</title>
+</head>
+<body>
+    <h1>Make a Prediction</h1>
+
+    <nav>
+        <a href="/">Home</a> |
+        <a href="/about">About</a> |
+        <a href="/predict">Predict</a>
+    </nav>
+
+    <h2>Enter input values:</h2>
+
+    <form action="/predict" method="post">
+        <label>Feature 1:</label>
+        <input type="number" step="any" name="feature1" required><br><br>
+
+        <label>Feature 2:</label>
+        <input type="number" step="any" name="feature2" required><br><br>
+
+        <label>Feature 3:</label>
+        <input type="number" step="any" name="feature3" required><br><br>
+
+        <label>Feature 4:</label>
+        <input type="number" step="any" name="feature4" required><br><br>
+
+        <!-- Add more inputs if your model needs them -->
+
+        <button type="submit">Predict</button>
+    </form>
+</body>
+</html>
