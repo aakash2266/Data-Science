@@ -4,50 +4,37 @@
 {% block main %}
 
 <style>
-  .predict-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr);
-    gap: 18px;
-  }
-
-  @media (max-width: 768px) {
-    .predict-layout {
-      grid-template-columns: 1fr;
-    }
-  }
-
+  /* Make labels visible */
   .field-label {
-    font-size: 0.9rem;
-    color: #e5e7eb;
+      color: #e5e7eb !important;  /* light grey */
   }
 
+  /* Make hint text visible */
   .hint-text {
-    font-size: 0.8rem;
-    color: #9ca3af;
+      color: #9ca3af !important;
   }
 
-  .side-card-title {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 6px;
+  /* Make form input text white */
+  .form-control {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #f1f5f9 !important;
   }
 
-  .side-card-text {
-    font-size: 0.85rem;
-    color: #cbd5f5;
+  /* Placeholder text */
+  .form-control::placeholder {
+      color: #94a3b8;  
   }
 
-  .metric-badge {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 0.8rem;
-    background: rgba(15, 118, 110, 0.35);
-    color: #a7f3d0;
-    margin-right: 4px;
-    margin-bottom: 4px;
+  /* Input focus state */
+  .form-control:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 1px #3b82f6;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
   }
 </style>
+
 
 <div class="glass-card">
   <h3 class="mb-2">Predict Battery Drop</h3>
