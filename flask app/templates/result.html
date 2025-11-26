@@ -1,13 +1,115 @@
-{% extends 'base.html' %}
-{% block title %}
-<h1>
-    Result Page
+{% extends "base.html" %}
+{% block title %}Result{% endblock %}
 
-</h1>
-{% endblock %}
 {% block main %}
-<h2>Your prediction:</h2>
-<p>{{ result }}</p>
-{% endblock %}
 
- 
+<style>
+  .result-box {
+    background: rgba(15, 23, 42, 0.85);
+    padding: 22px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    text-align: center;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+  }
+
+  .result-value {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: #4ade80;
+    margin: 6px 0;
+  }
+
+  .small-label {
+    color: #e5e7eb;
+    font-size: 0.95rem;
+  }
+
+  .mini-note {
+    font-size: 0.8rem;
+    color: #9ca3af;
+  }
+
+  #miniChart {
+    max-width: 170px;
+    margin: 8px auto 0;
+    /* Make main hero card pop more */
+.hero-card {
+  border: 1px solid rgba(59, 130, 246, 0.9);
+  box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
+}
+
+/* Model chips under title */
+.model-chip {
+  font-size: 0.8rem;
+  border-radius: 999px;
+}
+
+/* Feature cards (the 3 small ones) */
+.feature-card {
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(75, 85, 99, 0.7);
+}
+
+.feature-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #f9fafb;
+}
+
+.feature-text {
+  font-size: 0.86rem;
+  color: #cbd5f5; /* lighter so it’s readable */
+  margin-bottom: 0;
+}
+
+  }
+</style>
+
+<div class="result-box">
+  <p class="small-label mb-1">Predicted Battery Drop</p>
+  <div class="result-value">{{ result|round(2) }}%</div>
+  <p class="mini-note mb-2">
+    Higher distance, speed, rider weight, or temperature may increase this value.
+  </p>
+
+  <canvas id="miniChart"></canvas>
+
+  <a href="/predict" class="btn btn-outline-light btn-sm mt-3">
+    Predict Another Ride
+  </a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  const val = parseFloat("{{ result|float|round(2) }}");
+  const used = Math.min(Math.max(val, 0), 100);
+  const remaining = 100 - used;
+
+  new Chart(document.getElementById("miniChart"), {
+    type: "doughnut",
+    data: {
+      labels: ["Used", "Remaining"],
+      datasets: [
+        {
+          data: [used, remaining],
+          backgroundColor: ["#f97373", "#4ade80"],
+          borderWidth: 0,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      cutout: "70%",
+      plugins: {
+        legend: { display: false },
+      },
+    },
+  });
+</script>
+
+{% endblock %}

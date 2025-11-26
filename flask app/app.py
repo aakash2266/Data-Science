@@ -13,9 +13,7 @@ with open("NEWscaler.pkl", "rb") as f:
 def home():
     return render_template("index.html")
 
-@app.route("/about")
-def about():
-    return render_template("about.html")
+
 
 @app.route("/predict", methods=["GET", "POST"])
 def predict():
@@ -38,6 +36,10 @@ def predict():
             return render_template("result.html", result=f"Error: {e}")
 
     return render_template("predict.html")
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
 
 if __name__ == "__main__":
     app.run(debug=True)

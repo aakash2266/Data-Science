@@ -1,43 +1,169 @@
-{% extends 'base.html' %}
-{% block title %}
-<h1 class="mt-4 mb-4 text-center">
-    Result Page
-</h1>
-{% endblock %}
+{% extends "base.html" %}
+{% block title %}Predict{% endblock %}
 
 {% block main %}
-<div class="container mt-4">
-    <h2 class="mb-4">Enter input values:</h2>
 
-    <form action="/predict" method="post" class="row g-3">
+<style>
+  .predict-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr);
+    gap: 18px;
+  }
+
+  @media (max-width: 768px) {
+    .predict-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .field-label {
+    font-size: 0.9rem;
+    color: #e5e7eb;
+  }
+
+  .hint-text {
+    font-size: 0.8rem;
+    color: #9ca3af;
+  }
+
+  .side-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .side-card-text {
+    font-size: 0.85rem;
+    color: #cbd5f5;
+  }
+
+  .metric-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    background: rgba(15, 118, 110, 0.35);
+    color: #a7f3d0;
+    margin-right: 4px;
+    margin-bottom: 4px;
+  }
+</style>
+
+<div class="glass-card">
+  <h3 class="mb-2">Predict Battery Drop</h3>
+  <p class="small text-muted mb-3">
+    Enter your ride details below. The Linear Regression model will estimate the expected
+    <strong>battery drop percentage</strong> for this trip.
+  </p>
+
+  <div class="predict-layout">
+
+    <!-- LEFT: FORM -->
+    <div>
+      <form method="post" class="row g-3" id="predictForm">
+        <div class="col-md-6">
+          <label class="field-label mb-1">Ride Distance (km)</label>
+          <input
+            type="number"
+            step="any"
+            name="feature1"
+            class="form-control"
+            placeholder="e.g. 12.5"
+            required
+          />
+          <div class="hint-text mt-1">Total distance for this trip.</div>
+        </div>
 
         <div class="col-md-6">
-            <label class="form-label">Ride Distance</label>
-            <input type="number" step="any" name="feature1" class="form-control" required>
+          <label class="field-label mb-1">Average Speed (km/h)</label>
+          <input
+            type="number"
+            step="any"
+            name="feature2"
+            class="form-control"
+            placeholder="e.g. 24"
+            required
+          />
+          <div class="hint-text mt-1">Approximate average riding speed.</div>
         </div>
 
         <div class="col-md-6">
-            <label class="form-label">Speed</label>
-            <input type="number" step="any" name="feature2" class="form-control" required>
+          <label class="field-label mb-1">Temperature (°C)</label>
+          <input
+            type="number"
+            step="any"
+            name="feature3"
+            class="form-control"
+            placeholder="e.g. 30"
+            required
+          />
+          <div class="hint-text mt-1">Higher temperatures can affect battery efficiency.</div>
         </div>
 
         <div class="col-md-6">
-            <label class="form-label">Temperature</label>
-            <input type="number" step="any" name="feature3" class="form-control" required>
+          <label class="field-label mb-1">Rider Weight (kg)</label>
+          <input
+            type="number"
+            step="any"
+            name="feature4"
+            class="form-control"
+            placeholder="e.g. 70"
+            required
+          />
+          <div class="hint-text mt-1">Include backpack / extra load if any.</div>
         </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Weight</label>
-            <input type="number" step="any" name="feature4" class="form-control" required>
+        <div class="col-12 mt-2 d-flex gap-2">
+          <button type="submit" class="btn btn-success flex-grow-1">
+            Predict Battery Drop
+          </button>
+          <button type="button" class="btn btn-outline-light" id="demoFillBtn">
+            Use Demo Values
+          </button>
         </div>
+      </form>
+    </div>
 
-        <div class="col-12 mt-3">
-            <button type="submit" class="btn btn-primary w-100">Predict</button>
-        </div>
+    <!-- RIGHT: SIDE INFO -->
+    <div class="glass-card">
+      <div class="side-card-title">What the model uses</div>
+      <p class="side-card-text mb-2">
+        This Linear Regression model was trained on real ride data with
+        <strong>StandardScaler</strong> applied to all input features.
+      </p>
 
-    </form>
+      <div class="mb-2">
+        <span class="metric-badge">RideDistance_km</span>
+        <span class="metric-badge">AvgSpeed_kmh</span>
+        <span class="metric-badge">Temperature_C</span>
+        <span class="metric-badge">RiderWeight_kg</span>
+      </div>
+
+      <p class="side-card-text mb-0">
+        Try different combinations to see how distance, speed, weight and temperature
+        change the predicted battery drop. In future, more models (like Random Forest
+        or XGBoost) could be added using the same UI.
+      </p>
+    </div>
+
+  </div>
 </div>
+
+<script>
+  function randomWithin(min, max) {
+    return (Math.random() * (max - min) + min).toFixed(2);
+  }
+
+  document.getElementById("demoFillBtn").addEventListener("click", function () {
+    const form = document.getElementById("predictForm");
+
+    // Generate realistic demo values
+    form.feature1.value = randomWithin(1, 25);   // RideDistance_km
+    form.feature2.value = randomWithin(10, 35);  // AvgSpeed_kmh
+    form.feature3.value = randomWithin(15, 40);  // Temperature_C
+    form.feature4.value = randomWithin(40, 110); // RiderWeight_kg
+  });
+</script>
+
+
 {% endblock %}
-
-
-

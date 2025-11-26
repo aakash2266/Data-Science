@@ -1,15 +1,48 @@
-{% extends 'base.html' %}
-{% block title %}
-<h1>
-    Home Page
+{% extends "base.html" %}
+{% block title %}About{% endblock %}
 
-</h1>
-{% endblock %}
 {% block main %}
-<h1>
-    <h1>About This App</h1>
-    <p>This app is built using Flask and a regression model saved in a .pkl file.</p>
 
-</h1>
+<div class="glass-card p-4" style="border-radius:16px;">
+
+    <h3 class="mb-3" style="color:#f1f5f9;">About This Project</h3>
+
+    <p style="color:#cbd5f5; font-size:0.95rem;">
+        This web application predicts the <strong style="color:#fff;">BatteryDrop_Percent</strong> 
+        for an e-bike ride using a Machine Learning model built in Python.  
+        It takes into account **distance**, **speed**, **temperature**, and **rider weight** 
+        to estimate how much battery your ride will consume.
+    </p>
+
+    <hr class="border-secondary" />
+
+    <h5 class="mt-3 mb-2" style="color:#e2e8f0;">How the Model Works</h5>
+    <ul style="color:#cbd5f5; font-size:0.9rem;">
+        <li>Inputs: RideDistance_km, AvgSpeed_kmh, Temperature_C, RiderWeight_kg.</li>
+        <li>Preprocessed using <strong style="color:#fff;">StandardScaler</strong> for better model stability.</li>
+        <li>Trained using <strong style="color:#fff;">Linear Regression</strong> on real e-bike data.</li>
+        <li>Saved as <code>model.pkl</code> and loaded into Flask for live predictions.</li>
+    </ul>
+
+    <hr class="border-secondary" />
+
+    <h5 class="mt-3 mb-2" style="color:#e2e8f0;">Tech Stack</h5>
+    <p style="color:#cbd5f5;">
+        <span class="badge bg-primary me-1">Python</span>
+        <span class="badge bg-info text-dark me-1">Flask</span>
+        <span class="badge bg-success me-1">scikit-learn</span>
+        <span class="badge bg-secondary me-1">Bootstrap 5</span>
+    </p>
+
+    <hr class="border-secondary" />
+
+    <h5 class="mt-3 mb-2" style="color:#e2e8f0;">Project Goal</h5>
+    <p style="color:#cbd5f5; font-size:0.95rem;">
+        This project demonstrates the full ML deployment pipeline:  
+        data preprocessing, model training, saving with pickle, Flask integration,  
+        and building a modern UI suitable for class presentations and real demos.
+    </p>
+
+</div>
+
 {% endblock %}
-
