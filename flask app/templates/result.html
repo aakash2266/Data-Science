@@ -1,18 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Result - Regression App</title>
-</head>
-<body>
-    <h1>Prediction Result</h1>
+{% extends 'base.html' %}
+{% block title %}
+<h1>
+    Result Page
 
-    <nav>
-        <a href="/">Home</a> |
-        <a href="/about">About</a> |
-        <a href="/predict">Predict</a>
-    </nav>
+</h1>
+{% endblock %}
+{% block main %}
+<h2>Your prediction:</h2>
+<p>{{ result }}</p>
+{% endblock %}
 
-    <h2>Your prediction:</h2>
-    <p>{{ result }}</p>
-</body>
-</html>
+ 

@@ -1,16 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>About - Regression App</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block title %}
+<h1>
+    Home Page
+
+</h1>
+{% endblock %}
+{% block main %}
+<h1>
     <h1>About This App</h1>
     <p>This app is built using Flask and a regression model saved in a .pkl file.</p>
 
-    <nav>
-        <a href="/">Home</a> |
-        <a href="/about">About</a> |
-        <a href="/predict">Predict</a>
-    </nav>
-</body>
-</html>
+</h1>
+{% endblock %}
+
