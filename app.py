@@ -4,10 +4,11 @@ import numpy as np
 
 app = Flask(__name__)
 
-with open("NEWlr_model.pkl", "rb") as f:
-    model = pickle.load(f)
-with open("NEWscaler.pkl", "rb") as f:
-    scaler = pickle.load(f)
+with open("models_and_datasets/NEWlr_model.pkl", "rb") as f:
+    lr_model = pickle.load(f)
+
+with open("models_and_datasets/NEWscaler.pkl", "rb") as f:
+    lr_scaler = pickle.load(f)
 
 @app.route("/")
 def home():
@@ -26,9 +27,9 @@ def predict():
 
             input_data = np.array([[feature1, feature2, feature3,feature4]])
 
-            input_scaled = scaler.transform(input_data)
+            input_scaled = lr_scaler.transform(input_data)
 
-            prediction = model.predict(input_scaled)[0]
+            prediction = lr_model.predict(input_scaled)[0]
 
             return render_template("result.html", result=prediction)
 
