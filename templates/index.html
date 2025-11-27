@@ -5,18 +5,24 @@
 
 <style>
     .model-card {
-        border-radius: 18px;
-        padding: 28px;
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        transition: 0.25s ease;
-    }
-    .model-card:hover {
-        transform: translateY(-4px);
-        border-color: rgba(255, 255, 255, 0.25);
-        background: rgba(255, 255, 255, 0.08);
-    }
+    border-radius: 18px;
+    padding: 28px;
+    background: rgba(30, 41, 59, 0.55); /* deeper slate-blue glass */
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 20px rgba(0,0,0,0.4), 
+                inset 0 0 20px rgba(255,255,255,0.04);
+    transition: 0.3s ease;
+}
+
+.model-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.22);
+    background: rgba(30, 41, 59, 0.7);
+    box-shadow: 0 0 25px rgba(0,0,0,0.6),
+                inset 0 0 25px rgba(255,255,255,0.06);
+}
+
 
     .model-title {
         font-size: 1.8rem;
