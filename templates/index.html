@@ -3,78 +3,113 @@
 
 {% block main %}
 
-<!-- HERO SECTION -->
-<div class="glass-card mb-4 p-4" style="border-radius:18px;">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+<style>
+    .model-card {
+        border-radius: 18px;
+        padding: 28px;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: 0.25s ease;
+    }
+    .model-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(255, 255, 255, 0.25);
+        background: rgba(255, 255, 255, 0.08);
+    }
 
-        <!-- LEFT -->
-        <div class="flex-grow-1 me-md-4">
-            <div class="pill mb-3">
-                ⚡ E-Bike Battery Estimator
-            </div>
+    .model-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
-            <h1 class="hero-title mb-2" style="font-size:2.2rem; font-weight:700;">
-                Predict your ride's battery drop in seconds.
-            </h1>
+    .model-desc {
+        color: #cbd5e1; 
+        font-size: 0.9rem;
+        line-height: 1.5rem;
+    }
 
-            <p class="hero-subtitle mb-3" style="max-width:500px;">
-                Enter ride distance, average speed, temperature and rider weight to estimate
-                how much battery your e-bike will consume for any trip.
-            </p>
+    .model-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
 
-            
+    .badge-lr { background: #38bdf8; color: #0d1b2a; }
+    .badge-svm { background: #facc15; color: #1e1e1e; }
 
-            <a href="/predict" class="btn btn-primary btn-lg px-4">
-                Try a Prediction
-            </a>
-        </div>
+    ul.model-points li {
+        color: #94a3b8;
+        margin-bottom: 6px;
+    }
+    .model-btn {
+    display: inline-block;
+    background: #3b82f6;
+    color: white !important;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.25s ease;
+}
+.model-btn:hover {
+    background: #60a5fa;
+    transform: translateY(-3px);
+}
 
-        <!-- RIGHT: EXAMPLE -->
-        <div class="text-md-end text-start mt-4 mt-md-0">
-            <div class="fw-semibold text-secondary">Example ride</div>
-            <div class="text-light small">
-                12 km • 25 km/h • 30°C • 70 kg
-            </div>
-            <div class="mt-2">
-                <span class="badge bg-success">≈ 38% battery</span>
-            </div>
-        </div>
+</style>
 
+<!-- LINEAR REGRESSION CARD -->
+<div class="model-card mb-4">
+    <div class="model-title">
+        📈 Linear Regression
+        <span class="model-badge badge-lr">Regression Model</span>
     </div>
+
+    <p class="model-desc mt-2">
+        Linear Regression fits a straight line through data to estimate a continuous value.
+        This model is trained on ride-related features and predicts numerical output based
+        on patterns in the dataset.
+    </p>
+
+    <ul class="model-points">
+        <li>Predicts continuous numeric values</li>
+        <li>Simple, interpretable model</li>
+        <li>Uses scaled numeric inputs</li>
+        <li>Trained on your e-bike dataset</li>
+    </ul>
+
+    <a href="/predict" class="model-btn mt-2">🚀 Try Linear Regression</a>
+
 </div>
 
-<!-- FEATURE CARDS -->
-<div class="row g-3">
-
-    <div class="col-md-4">
-        <div class="glass-card p-3 h-100" style="border-radius:14px;">
-            <div class="feature-icon mb-2" style="font-size:1.8rem;">📊</div>
-            <h5 class="feature-title mb-1">ML-Powered</h5>
-            <p class="feature-text">
-                Uses a Linear Regression model trained on real e-bike ride data to estimate battery usage.
-            </p>
-        </div>
+<!-- SVM CARD -->
+<div class="model-card mb-4">
+    <div class="model-title">
+        🤖 Support Vector Machines (SVM)
+        <span class="model-badge badge-svm">Classification Model</span>
     </div>
 
-    <div class="col-md-4">
-        <div class="glass-card p-3 h-100" style="border-radius:14px;">
-            <div class="feature-icon mb-2" style="font-size:1.8rem;">🚴‍♂️</div>
-            <h5 class="feature-title mb-1">Ride-Aware Inputs</h5>
-            <p class="feature-text">
-                Considers distance, speed, temperature, and rider weight for realistic battery predictions.
-            </p>
-        </div>
-    </div>
+    <p class="model-desc mt-2">
+        SVM uses hyperplanes to classify data into different categories. This model supports
+        multiple kernels — Linear, Polynomial, and RBF — allowing flexible transformation of
+        your input space.
+    </p>
 
-    <div class="col-md-4">
-        <div class="glass-card p-3 h-100" style="border-radius:14px;">
-            <div class="feature-icon mb-2" style="font-size:1.8rem;">🧪</div>
-            <h5 class="feature-title mb-1">Experiment Freely</h5>
-            <p class="feature-text">
-                Try different ride conditions to see how your battery usage changes instantly.
-            </p>
-        </div>
-    </div>
+    <ul class="model-points">
+        <li>Works with Linear, Polynomial, and RBF kernels</li>
+        <li>Ideal for complex decision boundaries</li>
+        <li>Trained on Study Hours & Attendance</li>
+        <li>Great performance on small/medium datasets</li>
+    </ul>
+
+    <a href="/predict_svm" class="model-btn mt-2">⚡ Try SVM Models</a>
 
 </div>
 

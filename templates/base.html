@@ -119,47 +119,146 @@ input:-webkit-autofill {
 
   <body>
     <header>
-      <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-        <div class="container">
-          <a class="navbar-brand brand-highlight" href="/">Machine Learning Models</a>
-          <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#collapsibleNavId"
-            aria-controls="collapsibleNavId"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="collapsibleNavId">
-            <ul class="navbar-nav ms-auto">
-              <li class="nav-item">
-                <a
-                  class="nav-link {% if request.path=='/' %}active{% endif %}"
-                  href="/"
-                  >Home</a
-                >
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link {% if request.path=='/about' %}active{% endif %}"
-                  href="/about"
-                  >About</a
-                >
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link {% if request.path=='/predict' %}active{% endif %}"
-                  href="/predict"
-                  >Predict</a
-                >
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
+      <nav class="navbar navbar-expand-lg custom-navbar py-3">
+  <div class="container">
+    <a class="navbar-brand nav-title d-flex align-items-center gap-2" href="/">
+    <div class="gear-icon">
+        <div class="gear-spokes"></div>
+    </div>
+    ML Model Hub
+</a>
+
+
+
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNav"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+
+        <li class="nav-item">
+          <a class="nav-link nav-link-custom" href="/">Home</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link nav-link-custom" href="/about">About</a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<style>
+  .custom-navbar {
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 25px rgba(0,0,0,0.4);
+  }
+
+  .nav-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #f9fafb !important;
+    letter-spacing: 0.4px;
+  }
+
+  .nav-link-custom {
+    color: #cbd5e1 !important;
+    margin-left: 18px;
+    font-size: 0.95rem;
+    transition: 0.25s ease;
+    border-bottom: 2px solid transparent;
+  }
+
+  .nav-link-custom:hover {
+    color: #ffffff !important;
+    border-bottom: 2px solid #3b82f6;
+  }
+
+  /* ⚙️ GEAR ICON */
+  .gear-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #06b6d4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 12px rgba(59,130,246,0.6);
+      position: relative;
+      animation: gearPulse 3s infinite ease-in-out;
+  }
+
+  .gear-spokes {
+      width: 14px;
+      height: 14px;
+      border: 3px solid rgba(255,255,255,0.7);
+      border-radius: 50%;
+      position: relative;
+      animation: gearSpin 2.4s linear infinite;
+  }
+
+  .gear-spokes::before,
+  .gear-spokes::after {
+      content: "";
+      position: absolute;
+      background: rgba(255,255,255,0.85);
+      border-radius: 2px;
+  }
+
+  /* Gear spokes (teeth) */
+  .gear-spokes::before {
+      width: 3px;
+      height: 18px;
+      top: -7px;
+      left: 50%;
+      transform: translateX(-50%);
+  }
+
+  .gear-spokes::after {
+      width: 18px;
+      height: 3px;
+      left: -7px;
+      top: 50%;
+      transform: translateY(-50%);
+  }
+
+  /* Core animation */
+  @keyframes gearSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+  }
+
+  /* Glow pulsing effect */
+  @keyframes gearPulse {
+      0%, 100% {
+          box-shadow: 0 0 10px rgba(59,130,246,0.5),
+                      0 0 20px rgba(59,130,246,0.2);
+      }
+      50% {
+          box-shadow: 0 0 16px rgba(59,130,246,0.9),
+                      0 0 35px rgba(59,130,246,0.35);
+      }
+  }
+
+  /* Hover intensifies glow */
+  .nav-title:hover .gear-icon {
+      box-shadow: 0 0 22px rgba(96,165,250,1),
+                  0 0 40px rgba(96,165,250,0.6);
+      transition: 0.25s;
+  }
+</style>
+
+
+
     </header>
 
     <main class="page-wrapper">
@@ -173,7 +272,7 @@ input:-webkit-autofill {
     </main>
 
     <footer>
-      &copy; 2025 E-Bike Battery Prediction | Built with Flask & ML by @AakashSosa
+      &copy; 2025 ML Prediction Hub · Built with Flask & Machine Learning by Aakash Sosa
     </footer>
 
     <!-- Bootstrap JS -->

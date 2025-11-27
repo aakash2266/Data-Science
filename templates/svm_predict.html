@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}SVM Predict{% endblock %}
+
+{% block main %}
+
+<style>
+  .svm-card {
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 12px;
+  }
+  .svm-label {
+      font-size: 0.9rem;
+      color: #e5e7eb !important;
+  }
+  .svm-hint {
+      font-size: 0.8rem;
+      color: #9ca3af !important;
+  }
+  .svm-input {
+      background-color: rgba(15, 23, 42, 0.95) !important;
+      border: 1px solid rgba(148, 163, 184, 0.6) !important;
+      color: #f9fafb !important;
+  }
+  .svm-input::placeholder {
+      color: #94a3b8 !important;
+  }
+
+  .svm-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
+      gap: 18px;
+  }
+  @media (max-width: 768px) {
+      .svm-layout {
+          grid-template-columns: 1fr;
+      }
+  }
+
+  .svm-kernel-group .btn-check:checked + label {
+      background-color: #3b82f6;
+      color: #f9fafb;
+      border-color: #60a5fa;
+  }
+  .svm-kernel-btn {
+      color: #e5e7eb;
+      border-radius: 999px;
+  }
+
+  .svm-side-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e5e7eb;
+  }
+  .svm-side-text {
+      font-size: 0.85rem;
+      color: #cbd5f5;
+  }
+</style>
+
+<div class="glass-card svm-card">
+  <h3 class="mb-2" style="color:#f9fafb;">SVM Prediction</h3>
+  <p class="mb-4" style="color:#cbd5f5; font-size:0.9rem;">
+      Use <strong>Study_Hours</strong> and <strong>Attendance</strong> as inputs and
+      choose an SVM kernel to see how the model classifies the outcome.
+  </p>
+
+  <div class="svm-layout">
+
+    <!-- LEFT: FORM -->
+    <div>
+      <form method="post" class="row g-3" id="svmForm">
+
+        <!-- Kernel buttons -->
+        <div class="col-12">
+          <label class="svm-label mb-1 d-block">Kernel</label>
+          <div class="btn-group svm-kernel-group w-100" role="group">
+            <input type="radio" class="btn-check" name="kernel" id="kernelLinear" value="Linear" autocomplete="off">
+            <label class="btn btn-outline-light svm-kernel-btn" for="kernelLinear">Linear</label>
+
+            <input type="radio" class="btn-check" name="kernel" id="kernelPoly" value="Poly" autocomplete="off">
+            <label class="btn btn-outline-light svm-kernel-btn" for="kernelPoly">Polynomial</label>
+
+            <input type="radio" class="btn-check" name="kernel" id="kernelRbf" value="RBF" autocomplete="off" checked>
+            <label class="btn btn-outline-light svm-kernel-btn" for="kernelRbf">RBF</label>
+          </div>
+        </div>
+
+        <!-- Study Hours -->
+        <div class="col-md-6">
+          <label class="svm-label mb-1">Study Hours</label>
+          <input
+            type="number"
+            step="any"
+            name="study_hours"
+            class="form-control svm-input"
+            placeholder="e.g. 4.5"
+            required
+          />
+          <div class="svm-hint mt-1">Total hours spent studying.</div>
+        </div>
+
+        <!-- Attendance -->
+        <div class="col-md-6">
+          <label class="svm-label mb-1">Attendance (%)</label>
+          <input
+            type="number"
+            step="any"
+            name="attendance"
+            class="form-control svm-input"
+            placeholder="e.g. 85"
+            required
+          />
+          <div class="svm-hint mt-1">Overall attendance percentage.</div>
+        </div>
+
+        <div class="col-12 mt-2 d-flex gap-2">
+          <button type="submit" class="btn btn-success flex-grow-1">
+            Predict with SVM
+          </button>
+          <button type="button" class="btn btn-outline-light" id="svmDemoBtn">
+            Demo Values
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- RIGHT: INFO CARD -->
+    <div class="glass-card" style="border-radius:14px; padding:16px;">
+      <div class="svm-side-title mb-1">What this SVM uses</div>
+      <p class="svm-side-text mb-2">
+        This SVM is trained on two features:
+      </p>
+      <ul class="svm-side-text mb-2" style="padding-left:18px;">
+        <li><strong>Study_Hours</strong> – how long the student studied</li>
+        <li><strong>Attendance</strong> – percentage of classes attended</li>
+      </ul>
+      <p class="svm-side-text mb-0">
+        You can switch between <strong>Linear</strong>, <strong>Polynomial</strong>,
+        and <strong>RBF</strong> kernels to see how the decision boundary and
+        predictions might change.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function rand(min, max) {
+      return (Math.random() * (max - min) + min).toFixed(1);
+  }
+
+  document.getElementById("svmDemoBtn").addEventListener("click", function () {
+      const form = document.getElementById("svmForm");
+      form.study_hours.value = rand(0, 10);    // 0–10 hours
+      form.attendance.value = rand(50, 100);   // 50–100 %
+  });
+</script>
+
+{% endblock %}
