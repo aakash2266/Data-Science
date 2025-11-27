@@ -4,112 +4,216 @@
 {% block main %}
 
 <style>
-  .result-box {
-    background: rgba(15, 23, 42, 0.85);
-    padding: 22px;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-    text-align: center;
-    border: 1px solid rgba(148, 163, 184, 0.3);
+  .result-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+  }
+
+  @media (min-width: 768px) {
+      .result-wrapper {
+          flex-direction: row;
+      }
+  }
+
+  .result-card-main {
+      flex: 1.4;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 18px;
+      padding: 20px 22px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow: 0 14px 30px rgba(0,0,0,0.6);
+  }
+
+  .result-card-side {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.85);
+      border-radius: 18px;
+      padding: 18px 20px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  }
+
+  .result-label {
+      font-size: 0.95rem;
+      color: #e5e7eb;
   }
 
   .result-value {
-    font-size: 2.4rem;
-    font-weight: 700;
-    color: #4ade80;
-    margin: 6px 0;
+      font-size: 2.6rem;
+      font-weight: 700;
+      color: #4ade80;
+      margin: 4px 0 6px;
   }
 
-  .small-label {
-    color: #e5e7eb;
-    font-size: 0.95rem;
+  .result-sub {
+      font-size: 0.85rem;
+      color: #9ca3af;
   }
 
-  .mini-note {
-    font-size: 0.8rem;
-    color: #9ca3af;
+  .chart-container {
+      position: relative;
+      width: 210px;
+      height: 210px;
+      margin: 10px auto 0;
   }
 
-  #miniChart {
-    max-width: 170px;
-    margin: 8px auto 0;
-    /* Make main hero card pop more */
-.hero-card {
-  border: 1px solid rgba(59, 130, 246, 0.9);
-  box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
-}
-
-/* Model chips under title */
-.model-chip {
-  font-size: 0.8rem;
-  border-radius: 999px;
-}
-
-/* Feature cards (the 3 small ones) */
-.feature-card {
-  background: rgba(15, 23, 42, 0.9);
-  border-radius: 14px;
-  padding: 18px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(75, 85, 99, 0.7);
-}
-
-.feature-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #f9fafb;
-}
-
-.feature-text {
-  font-size: 0.86rem;
-  color: #cbd5f5; /* lighter so it’s readable */
-  margin-bottom: 0;
-}
-
+  #batteryChart {
+      width: 100%;
+      height: 100%;
   }
+
+  .chart-center-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+  }
+
+  .chart-center-value {
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: #f9fafb;
+      line-height: 1.1;
+  }
+
+  .chart-center-label {
+      font-size: 0.8rem;
+      color: #9ca3af;
+  }
+
+  .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.9rem;
+      color: #e5e7eb;
+      margin-top: 8px;
+  }
+
+  .used-dot,
+  .remain-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      margin-right: 6px;
+  }
+
+  .used-dot {
+      background-color: #f97373;
+  }
+
+  .remain-dot {
+      background-color: #4ade80;
+  }
+
+  .side-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e5e7eb;
+      margin-bottom: 6px;
+  }
+
+  .side-text {
+      font-size: 0.85rem;
+      color: #cbd5f5;
+      margin-bottom: 8px;
+  }
+
+  .side-tip {
+      font-size: 0.8rem;
+      color: #9ca3af;
+  }
+
 </style>
 
-<div class="result-box">
-  <p class="small-label mb-1">Predicted Battery Drop</p>
-  <div class="result-value">{{ result|round(2) }}%</div>
-  <p class="mini-note mb-2">
-    Higher distance, speed, rider weight, or temperature may increase this value.
-  </p>
+<div class="result-wrapper">
 
-  <canvas id="miniChart"></canvas>
+  <!-- MAIN CARD -->
+  <div class="result-card-main text-center">
+      <p class="result-label mb-1">Predicted Battery Drop</p>
+      <div class="result-value">
+          {{ result|round(5) }}%
+      </div>
+      <p class="result-sub mb-3">
+          Based on your ride inputs, this is the estimated battery consumption for this trip.
+      </p>
 
-  <a href="/predict" class="btn btn-outline-light btn-sm mt-3">
-    Predict Another Ride
-  </a>
-</div>
+      <div class="chart-container">
+          <canvas id="batteryChart"></canvas>
+          <div class="chart-center-text">
+              <div class="chart-center-value" id="centerValue">--%</div>
+              <div class="chart-center-label">battery used</div>
+          </div>
+      </div>
 
+      <div class="stat-row">
+          <div>
+              <span class="used-dot"></span>
+              Used: <span id="usedText">--%</span>
+          </div>
+          <div>
+              <span class="remain-dot"></span>
+              Remaining: <span id="remainText">--%</span>
+          </div>
+      </div>
+
+      <a href="/predict" class="btn btn-outline-light btn-sm mt-3">
+          Predict Another Ride
+      </a>
+  </div>
+
+
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-  const val = parseFloat("{{ result|float|round(2) }}");
-  const used = Math.min(Math.max(val, 0), 100);
+  const rawVal = parseFloat("{{ result|float|round(2) }}");
+  const used = Math.min(Math.max(rawVal, 0), 100);    // clamp 0–100
   const remaining = 100 - used;
 
-  new Chart(document.getElementById("miniChart"), {
+  // Update text values
+  document.getElementById("usedText").textContent = used.toFixed(1) + "%";
+  document.getElementById("remainText").textContent = remaining.toFixed(1) + "%";
+  document.getElementById("centerValue").textContent = used.toFixed(1) + "%";
+
+  const ctx = document.getElementById("batteryChart").getContext("2d");
+
+new Chart(ctx, {
     type: "doughnut",
     data: {
-      labels: ["Used", "Remaining"],
-      datasets: [
-        {
-          data: [used, remaining],
-          backgroundColor: ["#f97373", "#4ade80"],
-          borderWidth: 0,
-        },
-      ],
+        labels: ["Battery Used", "Battery Remaining"],
+        datasets: [{
+            data: [used, remaining],
+           
+            hoverBorderColor: "transparent",
+            backgroundColor: ["#ff4d4d", "#00ff99"],
+            hoverBackgroundColor: ["#ff4d4d", "#00ff99"],
+
+            borderWidth: 0
+        }]
     },
     options: {
-      responsive: true,
-      cutout: "70%",
-      plugins: {
-        legend: { display: false },
-      },
-    },
-  });
+        responsive: true,
+        cutout: "70%",
+
+        plugins: {
+            legend: { display: false },
+            tooltip: { enabled: false }
+        },
+
+        hover: { mode: null },         // <-- disables darken-on-hover
+        interaction: { mode: null },   // <-- disables any hover action
+
+        animation: {
+            animateRotate: true,
+            animateScale: false
+        }
+    }
+});
+
 </script>
 
 {% endblock %}
