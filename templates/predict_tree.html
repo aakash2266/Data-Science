@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+{% block title %}Decision Tree Predict{% endblock %}
+
+{% block main %}
+
+<style>
+  .tree-card {
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 12px;
+  }
+  .tree-label {
+      font-size: 0.9rem;
+      color: #e5e7eb !important;
+  }
+  .tree-hint {
+      font-size: 0.8rem;
+      color: #9ca3af !important;
+  }
+  .tree-input {
+      background-color: rgba(15, 23, 42, 0.95) !important;
+      border: 1px solid rgba(148, 163, 184, 0.6) !important;
+      color: #f9fafb !important;
+  }
+  .tree-input::placeholder {
+      color: #94a3b8 !important;
+  }
+
+  .tree-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
+      gap: 18px;
+  }
+  @media (max-width: 768px) {
+      .tree-layout {
+          grid-template-columns: 1fr;
+      }
+  }
+
+  .tree-pill-group .btn-check:checked + label {
+      background-color: #4ade80;
+      color: #022c22;
+      border-color: #6ee7b7;
+  }
+  .tree-pill-btn {
+      color: #e5e7eb;
+      border-radius: 999px;
+  }
+
+  .tree-side-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e5e7eb;
+  }
+  .tree-side-text {
+      font-size: 0.85rem;
+      color: #cbd5f5;
+  }
+</style>
+
+<div class="glass-card tree-card">
+  <h3 class="mb-2" style="color:#f9fafb;">Decision Tree Prediction</h3>
+  <p class="mb-4" style="color:#cbd5f5; font-size:0.9rem;">
+      Use <strong>Study_Hours</strong> and <strong>Attendance</strong> as inputs and
+      explore Decision Tree hyperparameters to tune accuracy and behavior.
+  </p>
+
+  <div class="tree-layout">
+
+    <!-- LEFT: FORM -->
+    <div>
+      <form method="post" class="row g-3" id="treeForm">
+
+        <!-- CRITERION -->
+        <div class="col-12">
+          <label class="tree-label mb-1 d-block">Criterion (split quality)</label>
+          <div class="btn-group tree-pill-group w-100" role="group">
+            <input type="radio" class="btn-check" name="criterion" id="critGini"
+                   value="gini" autocomplete="off" checked>
+            <label class="btn btn-outline-light tree-pill-btn" for="critGini">Gini</label>
+
+            <input type="radio" class="btn-check" name="criterion" id="critEntropy"
+                   value="entropy" autocomplete="off">
+            <label class="btn btn-outline-light tree-pill-btn" for="critEntropy">Entropy</label>
+
+            <input type="radio" class="btn-check" name="criterion" id="critLogLoss"
+                   value="log_loss" autocomplete="off">
+            <label class="btn btn-outline-light tree-pill-btn" for="critLogLoss">Log Loss</label>
+          </div>
+          <div class="tree-hint mt-1">How the tree measures split purity.</div>
+        </div>
+
+        <!-- Study Hours -->
+        <div class="col-md-6">
+          <label class="tree-label mb-1">Study Hours</label>
+          <input
+            type="number"
+            step="any"
+            name="study_hours"
+            class="form-control tree-input"
+            placeholder="e.g. 4.5"
+            required
+          />
+          <div class="tree-hint mt-1">Total hours spent studying.</div>
+        </div>
+
+        <!-- Attendance -->
+        <div class="col-md-6">
+          <label class="tree-label mb-1">Attendance (%)</label>
+          <input
+            type="number"
+            step="any"
+            name="attendance"
+            class="form-control tree-input"
+            placeholder="e.g. 85"
+            required
+          />
+          <div class="tree-hint mt-1">Overall attendance percentage.</div>
+        </div>
+
+        <!-- Splitter + Max Depth -->
+        <div class="col-md-6">
+          <label class="tree-label mb-1">Splitter Strategy</label>
+          <select name="splitter" class="form-select tree-input">
+            <option value="best" selected>Best</option>
+            <option value="random">Random</option>
+          </select>
+          <div class="tree-hint mt-1">How the tree chooses each split.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="tree-label mb-1">Max Depth</label>
+          <input
+            type="number"
+            name="max_depth"
+            class="form-control tree-input"
+            placeholder="Blank = unlimited"
+          />
+          <div class="tree-hint mt-1">Limit depth to reduce overfitting.</div>
+        </div>
+
+        <!-- Min samples split / leaf -->
+        <div class="col-md-6">
+          <label class="tree-label mb-1">Min Samples Split</label>
+          <input
+            type="number"
+            name="min_samples_split"
+            class="form-control tree-input"
+            value="2"
+            min="2"
+          />
+          <div class="tree-hint mt-1">Minimum samples to create a split.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="tree-label mb-1">Min Samples Leaf</label>
+          <input
+            type="number"
+            name="min_samples_leaf"
+            class="form-control tree-input"
+            value="1"
+            min="1"
+          />
+          <div class="tree-hint mt-1">Minimum samples at a leaf node.</div>
+        </div>
+
+        <!-- Max features -->
+        <div class="col-md-12">
+          <label class="tree-label mb-1">Max Features</label>
+          <select name="max_features" class="form-select tree-input">
+            <option value="None" selected>Use all</option>
+            <option value="sqrt">sqrt</option>
+            <option value="log2">log2</option>
+          </select>
+          <div class="tree-hint mt-1">Features checked at each split.</div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="col-12 mt-2 d-flex gap-2">
+          <button type="submit" class="btn btn-success flex-grow-1">
+            Train & Predict
+          </button>
+          <button type="button" class="btn btn-outline-light" id="treeDemoBtn">
+            Demo Values
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- RIGHT: INFO PANEL -->
+    <div class="glass-card" style="border-radius:14px; padding:16px;">
+      <div class="tree-side-title mb-2">🌳 How a Decision Tree Works</div>
+
+      <p class="tree-side-text mb-2">
+        A Decision Tree splits the data step-by-step using simple rules like:
+        <br>
+        <em>“Is Study_Hours &gt; 3.5?”</em>
+        Each answer (Yes / No) sends the student down a different branch
+        until the tree reaches a final decision: <strong>Pass</strong> or <strong>Fail</strong>.
+      </p>
+
+      <div class="tree-side-title mt-3 mb-1">🧠 Why Hyperparameters Matter</div>
+      <ul class="tree-side-text mb-2" style="padding-left:18px;">
+        <li><strong>Criterion</strong> – how “good” each split is.</li>
+        <li><strong>Max Depth</strong> – how tall the tree can grow.</li>
+        <li><strong>Min Samples</strong> – stops the tree splitting on tiny groups.</li>
+        <li><strong>Max Features</strong> – limits features checked at each node.</li>
+      </ul>
+
+      <div class="tree-side-title mt-3 mb-1">⚖️ Overfitting vs Underfitting</div>
+      <p class="tree-side-text mb-2">
+        • Very deep tree → memorizes training data → <strong>Overfitting</strong><br>
+        • Very shallow tree → too simple → <strong>Underfitting</strong><br>
+        Good tuning keeps a balance between both.
+      </p>
+
+      <div class="tree-side-title mt-3 mb-1">🌱 Mini Example</div>
+      <pre style="color:#9ca3af; font-size:0.8rem; background:rgba(255,255,255,0.05); padding:8px; border-radius:8px;">
+Study_Hours &gt; 4?
+ ├── Yes → Attendance &gt; 70?
+ │      ├── Yes → PASS
+ │      └── No  → FAIL
+ └── No → FAIL
+      </pre>
+
+      <p class="tree-side-text">
+        Your chosen settings control how this tree grows and how accurate it becomes.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function rand(min, max) {
+      return (Math.random() * (max - min) + min).toFixed(1);
+  }
+
+  document.getElementById("treeDemoBtn").addEventListener("click", function () {
+      const form = document.getElementById("treeForm");
+
+      // main inputs
+      form.study_hours.value = rand(0, 10);
+      form.attendance.value = rand(50, 100);
+
+      // random selection for criterion
+      const criteria = ["critGini", "critEntropy", "critLogLoss"];
+      document.getElementById(criteria[Math.floor(Math.random() * 3)]).checked = true;
+
+      // random splitter
+      form.splitter.value = Math.random() > 0.5 ? "best" : "random";
+
+      // random max depth or blank
+      const depth = Math.random() > 0.5 ? Math.floor(Math.random() * 10) + 1 : "";
+      form.max_depth.value = depth;
+
+      // sample split/leaf values
+      form.min_samples_split.value = Math.floor(Math.random() * 4) + 2;
+      form.min_samples_leaf.value = Math.floor(Math.random() * 3) + 1;
+
+      // random max features
+      const features = ["None", "sqrt", "log2"];
+      form.max_features.value = features[Math.floor(Math.random() * 3)];
+  });
+</script>
+
+{% endblock %}
