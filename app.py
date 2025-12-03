@@ -5,6 +5,10 @@ from flask import Flask, render_template, request
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, export_text
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier, export_text
+from sklearn.ensemble import RandomForestClassifier, BaggingClassifier, AdaBoostClassifier
+from sklearn.metrics import accuracy_score
 
 app = Flask(__name__)
 
@@ -21,6 +25,15 @@ with open("models_and_datasets/svm_models.pkl", "rb") as f:
 
 with open("models_and_datasets/svm_scaler.pkl", "rb") as f:
     svm_scaler = pickle.load(f)
+def describe_accuracy(acc_percent: float) -> str:
+    if acc_percent >= 90:
+        return "Excellent performance – the model is classifying most students correctly."
+    elif acc_percent >= 80:
+        return "Good performance – the model is doing well with your current settings."
+    elif acc_percent >= 70:
+        return "Okay performance – could be improved by tuning depth or min samples."
+    else:
+        return "Low accuracy – the model is struggling. Try limiting depth or increasing min samples."
 
 
 @app.route("/")
@@ -255,6 +268,282 @@ def predict_tree():
 
     # GET → just show the form
     return render_template("predict_tree.html")
+
+@app.route("/predict_rf", methods=["GET", "POST"])
+def predict_rf():
+    if request.method == "POST":
+        try:
+            study_hours = float(request.form["study_hours"])
+            attendance = float(request.form["attendance"])
+
+            # hyperparameters
+            n_estimators = int(request.form.get("n_estimators", 100))
+            criterion = request.form.get("criterion", "gini")
+            max_depth_raw = request.form.get("max_depth", "")
+            max_depth = int(max_depth_raw) if max_depth_raw else None
+
+            min_samples_split = int(request.form.get("min_samples_split", 2))
+            min_samples_leaf = int(request.form.get("min_samples_leaf", 1))
+
+            max_features_raw = request.form.get("max_features", "sqrt")
+            max_features = None if max_features_raw == "None" else max_features_raw
+
+            # train / test
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, train_size=0.8, random_state=42
+            )
+
+            forest = RandomForestClassifier(
+                n_estimators=n_estimators,
+                criterion=criterion,
+                max_depth=max_depth,
+                min_samples_split=min_samples_split,
+                min_samples_leaf=min_samples_leaf,
+                max_features=max_features,
+                random_state=42
+            )
+            forest.fit(X_train, y_train)
+
+            # accuracy
+            y_pred_test = forest.predict(X_test)
+            acc = accuracy_score(y_test, y_pred_test)
+            acc_percent = acc * 100.0
+            accuracy_desc = describe_accuracy(acc_percent)
+
+            # prediction for this student
+            sample = np.array([[study_hours, attendance]])
+            user_pred = forest.predict(sample)[0]
+            label = "Pass" if int(user_pred) == 1 else "Fail"
+
+            # feature importance (RF has it directly)
+            importances = forest.feature_importances_
+            feature_names = ["Study_Hours", "Attendance"]
+            feature_importance = [
+                {"name": feature_names[i], "value": float(importances[i])}
+                for i in range(len(importances))
+            ]
+
+            return render_template(
+                "result.html",
+                result=user_pred,
+                class_label=label,
+                model_name="Random Forest",
+                accuracy=round(acc_percent, 2),
+                accuracy_desc=accuracy_desc,
+                params={
+                    "n_estimators": n_estimators,
+                    "criterion": criterion,
+                    "max_depth": max_depth_raw or "None",
+                    "min_samples_split": min_samples_split,
+                    "min_samples_leaf": min_samples_leaf,
+                    "max_features": max_features_raw,
+                },
+                feature_importance=feature_importance,
+                show_chart=False
+            )
+
+        except Exception as e:
+            return render_template(
+                "result.html",
+                result=f"Error in Random Forest route: {e}",
+                model_name="Random Forest",
+                show_chart=False,
+                class_label=None
+            )
+
+    return render_template("predict_rf.html")
+
+@app.route("/predict_bagging", methods=["GET", "POST"])
+def predict_bagging():
+    if request.method == "POST":
+        try:
+            study_hours = float(request.form["study_hours"])
+            attendance = float(request.form["attendance"])
+
+            # base tree hyperparams
+            dt_max_depth_raw = request.form.get("dt_max_depth", "")
+            dt_max_depth = int(dt_max_depth_raw) if dt_max_depth_raw else None
+            dt_min_samples_split = int(request.form.get("dt_min_samples_split", 2))
+            dt_min_samples_leaf = int(request.form.get("dt_min_samples_leaf", 1))
+
+            # bagging hyperparams
+            n_estimators = int(request.form.get("n_estimators", 50))
+            max_samples = int(request.form.get("bag_max_samples", 100))
+            bag_max_features = int(request.form.get("bag_max_features", 2))
+            bootstrap_str = request.form.get("bootstrap", "True")
+            bootstrap = True if bootstrap_str == "True" else False
+
+            # train / test
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, train_size=0.8, random_state=42
+            )
+
+            base_tree = DecisionTreeClassifier(
+                criterion="gini",
+                max_depth=dt_max_depth,
+                min_samples_split=dt_min_samples_split,
+                min_samples_leaf=dt_min_samples_leaf,
+                random_state=42
+            )
+
+            bag = BaggingClassifier(
+                estimator=base_tree,
+                n_estimators=n_estimators,
+                max_samples=max_samples,
+                max_features=bag_max_features,
+                bootstrap=bootstrap,
+                random_state=42
+            )
+            bag.fit(X_train, y_train)
+
+            # accuracy
+            y_pred_test = bag.predict(X_test)
+            acc = accuracy_score(y_test, y_pred_test)
+            acc_percent = acc * 100.0
+            accuracy_desc = describe_accuracy(acc_percent)
+
+            # prediction
+            sample = np.array([[study_hours, attendance]])
+            user_pred = bag.predict(sample)[0]
+            label = "Pass" if int(user_pred) == 1 else "Fail"
+
+            # feature importance = average of trees (if available)
+            feature_names = ["Study_Hours", "Attendance"]
+            importances = None
+            if hasattr(bag.estimators_[0], "feature_importances_"):
+                all_imps = [est.feature_importances_ for est in bag.estimators_]
+                importances = np.mean(all_imps, axis=0)
+
+            feature_importance = []
+            if importances is not None:
+                feature_importance = [
+                    {"name": feature_names[i], "value": float(importances[i])}
+                    for i in range(len(importances))
+                ]
+
+            return render_template(
+                "result.html",
+                result=user_pred,
+                class_label=label,
+                model_name="Bagging (Decision Tree)",
+                accuracy=round(acc_percent, 2),
+                accuracy_desc=accuracy_desc,
+                params={
+                    "n_estimators": n_estimators,
+                    "max_samples": max_samples,
+                    "bag_max_features": bag_max_features,
+                    "bootstrap": bootstrap_str,
+                    "dt_max_depth": dt_max_depth_raw or "None",
+                    "dt_min_samples_split": dt_min_samples_split,
+                    "dt_min_samples_leaf": dt_min_samples_leaf,
+                },
+                feature_importance=feature_importance if feature_importance else None,
+                show_chart=False
+            )
+
+        except Exception as e:
+            return render_template(
+                "result.html",
+                result=f"Error in Bagging route: {e}",
+                model_name="Bagging",
+                show_chart=False,
+                class_label=None
+            )
+
+    return render_template("predict_bagging.html")
+
+@app.route("/predict_boost", methods=["GET", "POST"])
+def predict_boost():
+    if request.method == "POST":
+        try:
+            study_hours = float(request.form["study_hours"])
+            attendance = float(request.form["attendance"])
+
+            # base tree hyperparams
+            dt_max_depth_raw = request.form.get("dt_max_depth", "6")
+            dt_max_depth = int(dt_max_depth_raw) if dt_max_depth_raw else None
+            dt_min_samples_split = int(request.form.get("dt_min_samples_split", 20))
+            dt_min_samples_leaf = int(request.form.get("dt_min_samples_leaf", 10))
+
+            # boosting hyperparams
+            n_estimators = int(request.form.get("n_estimators", 100))
+            learning_rate = float(request.form.get("learning_rate", 1.0))
+
+            # train / test
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, train_size=0.8, random_state=42
+            )
+
+            base_tree = DecisionTreeClassifier(
+                criterion="gini",
+                max_depth=dt_max_depth,
+                max_features=None,  # keeping simple for 2-feature dataset
+                min_samples_split=dt_min_samples_split,
+                min_samples_leaf=dt_min_samples_leaf,
+                random_state=42
+            )
+
+            boost = AdaBoostClassifier(
+                estimator=base_tree,
+                n_estimators=n_estimators,
+                learning_rate=learning_rate,
+                random_state=42
+            )
+            boost.fit(X_train, y_train)
+
+            # accuracy
+            y_pred_test = boost.predict(X_test)
+            acc = accuracy_score(y_test, y_pred_test)
+            acc_percent = acc * 100.0
+            accuracy_desc = describe_accuracy(acc_percent)
+
+            # prediction
+            sample = np.array([[study_hours, attendance]])
+            user_pred = boost.predict(sample)[0]
+            label = "Pass" if int(user_pred) == 1 else "Fail"
+
+            # feature importance approx by average of trees
+            feature_names = ["Study_Hours", "Attendance"]
+            importances = None
+            if hasattr(boost.estimators_[0], "feature_importances_"):
+                all_imps = [est.feature_importances_ for est in boost.estimators_]
+                importances = np.mean(all_imps, axis=0)
+
+            feature_importance = []
+            if importances is not None:
+                feature_importance = [
+                    {"name": feature_names[i], "value": float(importances[i])}
+                    for i in range(len(importances))
+                ]
+
+            return render_template(
+                "result.html",
+                result=user_pred,
+                class_label=label,
+                model_name="AdaBoost (Decision Tree)",
+                accuracy=round(acc_percent, 2),
+                accuracy_desc=accuracy_desc,
+                params={
+                    "n_estimators": n_estimators,
+                    "learning_rate": learning_rate,
+                    "dt_max_depth": dt_max_depth_raw or "None",
+                    "dt_min_samples_split": dt_min_samples_split,
+                    "dt_min_samples_leaf": dt_min_samples_leaf,
+                },
+                feature_importance=feature_importance if feature_importance else None,
+                show_chart=False
+            )
+
+        except Exception as e:
+            return render_template(
+                "result.html",
+                result=f"Error in Boosting route: {e}",
+                model_name="Boosting",
+                show_chart=False,
+                class_label=None
+            )
+
+    return render_template("predict_boost.html")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Boosting Predict{% endblock %}
+
+{% block main %}
+
+<style>
+  .boost-card {
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 12px;
+  }
+  .boost-label {
+      font-size: 0.9rem;
+      color: #e5e7eb !important;
+  }
+  .boost-hint {
+      font-size: 0.8rem;
+      color: #9ca3af !important;
+  }
+  .boost-input {
+      background-color: rgba(15, 23, 42, 0.95) !important;
+      border: 1px solid rgba(148, 163, 184, 0.6) !important;
+      color: #f9fafb !important;
+  }
+  .boost-input::placeholder {
+      color: #94a3b8 !important;
+  }
+
+  .boost-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
+      gap: 18px;
+  }
+  @media (max-width: 768px) {
+      .boost-layout {
+          grid-template-columns: 1fr;
+      }
+  }
+
+  .boost-side-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e5e7eb;
+  }
+  .boost-side-text {
+      font-size: 0.85rem;
+      color: #cbd5f5;
+  }
+</style>
+
+<div class="glass-card boost-card">
+  <h3 class="mb-2" style="color:#f9fafb;">AdaBoost (Boosting)</h3>
+  <p class="mb-4" style="color:#cbd5f5; font-size:0.9rem;">
+      Boosting trains many small trees one after another. Each new tree focuses on
+      fixing the errors of the previous ones.
+  </p>
+
+  <div class="boost-layout">
+    <!-- LEFT: FORM -->
+    <div>
+      <form method="post" class="row g-3" id="boostForm">
+
+        <div class="col-md-6">
+          <label class="boost-label mb-1">Study Hours</label>
+          <input type="number" step="any" name="study_hours"
+                 class="form-control boost-input" placeholder="e.g. 4.5" required />
+        </div>
+
+        <div class="col-md-6">
+          <label class="boost-label mb-1">Attendance (%)</label>
+          <input type="number" step="any" name="attendance"
+                 class="form-control boost-input" placeholder="e.g. 85" required />
+        </div>
+
+        <div class="col-md-6">
+          <label class="boost-label mb-1">Number of Estimators</label>
+          <input type="number" name="n_estimators"
+                 class="form-control boost-input" value="100" min="10" />
+        </div>
+
+        <div class="col-md-6">
+          <label class="boost-label mb-1">Learning Rate</label>
+          <input type="number" step="0.1" name="learning_rate"
+                 class="form-control boost-input" value="1.0" />
+          <div class="boost-hint mt-1">Lower rate → slower but safer learning.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="boost-label mb-1">Base Tree Max Depth</label>
+          <input type="number" name="dt_max_depth"
+                 class="form-control boost-input" value="6" />
+        </div>
+
+        <div class="col-md-3">
+          <label class="boost-label mb-1">Base Tree Min Samples Split</label>
+          <input type="number" name="dt_min_samples_split"
+                 class="form-control boost-input" value="20" min="2" />
+        </div>
+
+        <div class="col-md-3">
+          <label class="boost-label mb-1">Base Tree Min Samples Leaf</label>
+          <input type="number" name="dt_min_samples_leaf"
+                 class="form-control boost-input" value="10" min="1" />
+        </div>
+
+        <div class="col-12 mt-2 d-flex gap-2">
+          <button type="submit" class="btn btn-success flex-grow-1">
+            Train &amp; Predict (AdaBoost)
+          </button>
+          <button type="button" class="btn btn-outline-light" id="boostDemoBtn">
+            Demo Values
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- RIGHT: INFO -->
+    <div class="glass-card" style="border-radius:14px; padding:16px;">
+      <div class="boost-side-title mb-1">⚡ What is Boosting?</div>
+      <p class="boost-side-text mb-2">
+        Boosting builds a sequence of weak trees. Each new tree tries harder on
+        the examples previous trees got wrong. In the end, all trees vote together.
+      </p>
+      <div class="boost-side-title mb-1">Key knobs</div>
+      <ul class="boost-side-text mb-2" style="padding-left:18px;">
+        <li><strong>n_estimators</strong>: how many trees are used.</li>
+        <li><strong>learning_rate</strong>: how strongly each tree is added.</li>
+        <li><strong>Base tree depth</strong>: how complex each weak learner is.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  function rand(min, max) {
+      return (Math.random() * (max - min) + min).toFixed(1);
+  }
+
+  document.getElementById("boostDemoBtn").addEventListener("click", function () {
+      const form = document.getElementById("boostForm");
+      form.study_hours.value = rand(0, 10);
+      form.attendance.value = rand(50, 100);
+      form.n_estimators.value = 50 + Math.floor(Math.random() * 80);
+      form.learning_rate.value = (0.5 + Math.random()).toFixed(1);
+  });
+</script>
+
+{% endblock %}

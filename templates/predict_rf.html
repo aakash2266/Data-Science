@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% block title %}Random Forest Predict{% endblock %}
+
+{% block main %}
+
+<style>
+  .rf-card {
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 12px;
+  }
+  .rf-label {
+      font-size: 0.9rem;
+      color: #e5e7eb !important;
+  }
+  .rf-hint {
+      font-size: 0.8rem;
+      color: #9ca3af !important;
+  }
+  .rf-input {
+      background-color: rgba(15, 23, 42, 0.95) !important;
+      border: 1px solid rgba(148, 163, 184, 0.6) !important;
+      color: #f9fafb !important;
+  }
+  .rf-input::placeholder {
+      color: #94a3b8 !important;
+  }
+
+  .rf-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
+      gap: 18px;
+  }
+  @media (max-width: 768px) {
+      .rf-layout {
+          grid-template-columns: 1fr;
+      }
+  }
+
+  .rf-side-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e5e7eb;
+  }
+  .rf-side-text {
+      font-size: 0.85rem;
+      color: #cbd5f5;
+  }
+</style>
+
+<div class="glass-card rf-card">
+  <h3 class="mb-2" style="color:#f9fafb;">Random Forest Prediction</h3>
+  <p class="mb-4" style="color:#cbd5f5; font-size:0.9rem;">
+      Random Forest builds many Decision Trees and combines their votes to make a
+      more stable and accurate prediction.
+  </p>
+
+  <div class="rf-layout">
+    <!-- LEFT: FORM -->
+    <div>
+      <form method="post" class="row g-3" id="rfForm">
+
+        <div class="col-md-6">
+          <label class="rf-label mb-1">Study Hours</label>
+          <input type="number" step="any" name="study_hours"
+                 class="form-control rf-input" placeholder="e.g. 4.5" required />
+          <div class="rf-hint mt-1">Total hours spent studying.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="rf-label mb-1">Attendance (%)</label>
+          <input type="number" step="any" name="attendance"
+                 class="form-control rf-input" placeholder="e.g. 85" required />
+          <div class="rf-hint mt-1">Overall attendance percentage.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="rf-label mb-1">Number of Trees (n_estimators)</label>
+          <input type="number" name="n_estimators" class="form-control rf-input"
+                 value="100" min="10" />
+          <div class="rf-hint mt-1">More trees → more stable but slower.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="rf-label mb-1">Criterion</label>
+          <select name="criterion" class="form-select rf-input">
+            <option value="gini" selected>gini</option>
+            <option value="entropy">entropy</option>
+            <option value="log_loss">log_loss</option>
+          </select>
+          <div class="rf-hint mt-1">How split quality is measured.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="rf-label mb-1">Max Depth</label>
+          <input type="number" name="max_depth" class="form-control rf-input"
+                 placeholder="Blank = unlimited" />
+          <div class="rf-hint mt-1">Limit tree depth to avoid overfitting.</div>
+        </div>
+
+        <div class="col-md-3">
+          <label class="rf-label mb-1">Min Samples Split</label>
+          <input type="number" name="min_samples_split"
+                 class="form-control rf-input" value="2" min="2" />
+        </div>
+
+        <div class="col-md-3">
+          <label class="rf-label mb-1">Min Samples Leaf</label>
+          <input type="number" name="min_samples_leaf"
+                 class="form-control rf-input" value="1" min="1" />
+        </div>
+
+        <div class="col-md-6">
+          <label class="rf-label mb-1">Max Features</label>
+          <select name="max_features" class="form-select rf-input">
+            <option value="sqrt" selected>sqrt</option>
+            <option value="log2">log2</option>
+            <option value="None">Use all</option>
+          </select>
+          <div class="rf-hint mt-1">How many features to try at each split.</div>
+        </div>
+
+        <div class="col-12 mt-2 d-flex gap-2">
+          <button type="submit" class="btn btn-success flex-grow-1">
+            Train &amp; Predict (Random Forest)
+          </button>
+          <button type="button" class="btn btn-outline-light" id="rfDemoBtn">
+            Demo Values
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- RIGHT: INFO -->
+    <div class="glass-card" style="border-radius:14px; padding:16px;">
+      <div class="rf-side-title mb-1">🌲 What is Random Forest?</div>
+      <p class="rf-side-text mb-2">
+        Random Forest creates many Decision Trees on random subsets of data and features,
+        then averages their votes. This usually gives better accuracy and less
+        overfitting than a single tree.
+      </p>
+      <div class="rf-side-title mb-1">Tuning tips</div>
+      <ul class="rf-side-text mb-2" style="padding-left:18px;">
+        <li><strong>n_estimators</strong>: more trees → more stable.</li>
+        <li><strong>max_depth</strong>: smaller depth → simpler model.</li>
+        <li><strong>min_samples_split/leaf</strong>: higher values → smoother boundaries.</li>
+        <li><strong>max_features</strong>: controls randomness at each split.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  function rand(min, max) {
+      return (Math.random() * (max - min) + min).toFixed(1);
+  }
+
+  document.getElementById("rfDemoBtn").addEventListener("click", function () {
+      const form = document.getElementById("rfForm");
+      form.study_hours.value = rand(0, 10);
+      form.attendance.value = rand(50, 100);
+      form.n_estimators.value = 50 + Math.floor(Math.random() * 100);
+      form.max_depth.value = Math.random() > 0.5 ? (3 + Math.floor(Math.random() * 5)) : "";
+      form.min_samples_split.value = 2 + Math.floor(Math.random() * 4);
+      form.min_samples_leaf.value = 1 + Math.floor(Math.random() * 3);
+  });
+</script>
+
+{% endblock %}

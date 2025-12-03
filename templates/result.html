@@ -203,10 +203,9 @@
         Here is what the model predicts and how confident it is.
     </p>
 
-    {# ===================== CLASSIFICATION (SVM / DECISION TREE) ===================== #}
+    {# ===================== CLASSIFICATION (SVM / Tree / Ensembles) ===================== #}
     {% if class_label %}
 
-        {# verdict box #}
         {% set verdict_class = "verdict-neutral" %}
         {% set verdict_icon = "?" %}
         {% if class_label == "Pass" %}
@@ -226,7 +225,8 @@
                     {{ class_label }}
                 </p>
                 <p class="verdict-text-sub">
-                    This means the student is predicted to <strong>{{ class_label }}</strong>.
+                    The student is predicted to <strong>{{ class_label }}</strong>
+                    based on their study pattern.
                 </p>
             </div>
         </div>
@@ -236,7 +236,7 @@
         </p>
 
         <div class="layout-grid">
-          <!-- LEFT SIDE: Accuracy + Text explanation -->
+          <!-- LEFT SIDE: Accuracy + settings -->
           <div class="metric-card">
               <div class="metric-title">Model Accuracy</div>
 
@@ -251,7 +251,9 @@
                       <div class="accuracy-bar-fill" style="width: {{ accuracy }}%;"></div>
                   </div>
               {% else %}
-                  <div class="metric-value">Accuracy not provided for this model.</div>
+                  <div class="metric-value">
+                      Accuracy not provided for this model.
+                  </div>
               {% endif %}
 
               {% if params is defined %}
@@ -264,7 +266,7 @@
               {% endif %}
           </div>
 
-          <!-- RIGHT SIDE: Feature importance + tree stats (Decision Tree only) -->
+          <!-- RIGHT SIDE: Feature importance & extra info -->
           <div class="metric-card">
               <div class="metric-title">What influenced this decision?</div>
 
@@ -286,28 +288,13 @@
                   {% endfor %}
               {% else %}
                   <p class="result-sub mb-1">
-                      This model does not provide feature importance.
+                      This model does not provide feature importance details.
                   </p>
-              {% endif %}
-
-              {% if tree_depth is defined and leaf_count is defined %}
-                  <div class="metric-title mt-2">Tree Complexity</div>
-                  <div class="metric-value">
-                      Depth: <strong>{{ tree_depth }}</strong> ·
-                      Leaves: <strong>{{ leaf_count }}</strong>
-                  </div>
-              {% endif %}
-
-              {% if top_feature is defined %}
-                  <div class="metric-value mt-1" style="font-size:0.85rem;">
-                      Most influential feature:
-                      <strong>{{ top_feature }}</strong>
-                  </div>
               {% endif %}
           </div>
         </div>
 
-    {# ===================== REGRESSION (LINEAR REGRESSION BATTERY DROP) ===================== #}
+    {# ===================== REGRESSION (Linear Regression battery drop) ===================== #}
     {% else %}
         <div class="verdict-box verdict-neutral">
             <div class="verdict-icon">⚡</div>
@@ -325,7 +312,7 @@
     <a href="/" class="btn btn-outline-light btn-sm mt-3">Back to Home</a>
 </div>
 
-{# ===================== LR DONUT CHART (ONLY WHEN show_chart == True) ===================== #}
+{# ===================== LR DONUT CHART ===================== #}
 {% if show_chart %}
     <div class="glass-card p-3" style="border-radius:16px;">
         <h6 class="mb-2" style="color:#e5e7eb;">Battery Drop Visual</h6>

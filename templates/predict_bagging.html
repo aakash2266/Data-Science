@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}Bagging Predict{% endblock %}
+
+{% block main %}
+
+<style>
+  .bag-card {
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 12px;
+  }
+  .bag-label {
+      font-size: 0.9rem;
+      color: #e5e7eb !important;
+  }
+  .bag-hint {
+      font-size: 0.8rem;
+      color: #9ca3af !important;
+  }
+  .bag-input {
+      background-color: rgba(15, 23, 42, 0.95) !important;
+      border: 1px solid rgba(148, 163, 184, 0.6) !important;
+      color: #f9fafb !important;
+  }
+  .bag-input::placeholder {
+      color: #94a3b8 !important;
+  }
+
+  .bag-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
+      gap: 18px;
+  }
+  @media (max-width: 768px) {
+      .bag-layout {
+          grid-template-columns: 1fr;
+      }
+  }
+
+  .bag-side-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e5e7eb;
+  }
+  .bag-side-text {
+      font-size: 0.85rem;
+      color: #cbd5f5;
+  }
+</style>
+
+<div class="glass-card bag-card">
+  <h3 class="mb-2" style="color:#f9fafb;">Bagging (Bootstrap Aggregating)</h3>
+  <p class="mb-4" style="color:#cbd5f5; font-size:0.9rem;">
+      Bagging trains many Decision Trees on different random samples of the data
+      and averages their predictions to reduce variance.
+  </p>
+
+  <div class="bag-layout">
+    <!-- LEFT: FORM -->
+    <div>
+      <form method="post" class="row g-3" id="bagForm">
+        <div class="col-md-6">
+          <label class="bag-label mb-1">Study Hours</label>
+          <input type="number" step="any" name="study_hours"
+                 class="form-control bag-input" placeholder="e.g. 4.5" required />
+        </div>
+
+        <div class="col-md-6">
+          <label class="bag-label mb-1">Attendance (%)</label>
+          <input type="number" step="any" name="attendance"
+                 class="form-control bag-input" placeholder="e.g. 85" required />
+        </div>
+
+        <div class="col-md-6">
+          <label class="bag-label mb-1">Number of Trees (n_estimators)</label>
+          <input type="number" name="n_estimators"
+                 class="form-control bag-input" value="50" min="10" />
+        </div>
+
+        <div class="col-md-3">
+          <label class="bag-label mb-1">Max Samples</label>
+          <input type="number" name="bag_max_samples"
+                 class="form-control bag-input" value="100" min="10" />
+          <div class="bag-hint mt-1">Samples per tree.</div>
+        </div>
+
+        <div class="col-md-3">
+          <label class="bag-label mb-1">Max Features</label>
+          <input type="number" name="bag_max_features"
+                 class="form-control bag-input" value="2" min="1" />
+          <div class="bag-hint mt-1">Features per tree.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="bag-label mb-1">Bootstrap Sampling</label>
+          <select name="bootstrap" class="form-select bag-input">
+            <option value="True" selected>Enabled (with replacement)</option>
+            <option value="False">Disabled</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="bag-label mb-1">Base Tree Max Depth</label>
+          <input type="number" name="dt_max_depth"
+                 class="form-control bag-input" placeholder="Blank = unlimited" />
+        </div>
+
+        <div class="col-md-3">
+          <label class="bag-label mb-1">Base Tree Min Samples Split</label>
+          <input type="number" name="dt_min_samples_split"
+                 class="form-control bag-input" value="2" min="2" />
+        </div>
+
+        <div class="col-md-3">
+          <label class="bag-label mb-1">Base Tree Min Samples Leaf</label>
+          <input type="number" name="dt_min_samples_leaf"
+                 class="form-control bag-input" value="1" min="1" />
+        </div>
+
+        <div class="col-12 mt-2 d-flex gap-2">
+          <button type="submit" class="btn btn-success flex-grow-1">
+            Train &amp; Predict (Bagging)
+          </button>
+          <button type="button" class="btn btn-outline-light" id="bagDemoBtn">
+            Demo Values
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- RIGHT: INFO -->
+    <div class="glass-card" style="border-radius:14px; padding:16px;">
+      <div class="bag-side-title mb-1">🎒 What does Bagging do?</div>
+      <p class="bag-side-text mb-2">
+        Bagging creates multiple bootstrap samples (random samples with replacement),
+        trains a tree on each, and then averages their predictions.
+        This reduces variance and helps avoid overfitting.
+      </p>
+      <div class="bag-side-title mb-1">Controls</div>
+      <ul class="bag-side-text mb-2" style="padding-left:18px;">
+        <li><strong>Max samples</strong>: data size used per tree.</li>
+        <li><strong>Max features</strong>: how many features each tree sees.</li>
+        <li><strong>Bootstrap</strong>: with/without replacement.</li>
+        <li><strong>Base tree depth</strong>: complexity of each tree.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  function rand(min, max) {
+      return (Math.random() * (max - min) + min).toFixed(1);
+  }
+
+  document.getElementById("bagDemoBtn").addEventListener("click", function () {
+      const form = document.getElementById("bagForm");
+      form.study_hours.value = rand(0, 10);
+      form.attendance.value = rand(50, 100);
+      form.n_estimators.value = 30 + Math.floor(Math.random() * 40);
+      form.bag_max_samples.value = 50 + Math.floor(Math.random() * 100);
+      form.bag_max_features.value = 2;
+      form.dt_max_depth.value = Math.random() > 0.5 ? (3 + Math.floor(Math.random() * 5)) : "";
+  });
+</script>
+
+{% endblock %}

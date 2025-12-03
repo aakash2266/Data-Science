@@ -1,146 +1,222 @@
-        {% extends "base.html" %}
-        {% block title %}Home{% endblock %}
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
 
-        {% block main %}
+{% block main %}
 
-        <style>
-            .model-card {
-            border-radius: 18px;
-            padding: 28px;
-            background: rgba(30, 41, 59, 0.55); /* deeper slate-blue glass */
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 20px rgba(0,0,0,0.4), 
-                        inset 0 0 20px rgba(255,255,255,0.04);
-            transition: 0.3s ease;
-        }
+<style>
+    .model-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 18px;
+    }
 
-        .model-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(255, 255, 255, 0.22);
-            background: rgba(30, 41, 59, 0.7);
-            box-shadow: 0 0 25px rgba(0,0,0,0.6),
-                        inset 0 0 25px rgba(255,255,255,0.06);
-        }
+    .model-card {
+        border-radius: 18px;
+        padding: 24px;
+        background: rgba(30, 41, 59, 0.55);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 0 20px rgba(0,0,0,0.4),
+                    inset 0 0 20px rgba(255,255,255,0.04);
+        transition: 0.3s ease;
+    }
 
+    .model-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(255, 255, 255, 0.22);
+        background: rgba(30, 41, 59, 0.7);
+        box-shadow: 0 0 25px rgba(0,0,0,0.6),
+                    inset 0 0 25px rgba(255,255,255,0.06);
+    }
 
-            .model-title {
-                font-size: 1.8rem;
-                font-weight: 700;
-                color: #f1f5f9;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
+    .model-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #f1f5f9;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
-            .model-desc {
-                color: #cbd5e1; 
-                font-size: 0.9rem;
-                line-height: 1.5rem;
-            }
+    .model-desc {
+        color: #cbd5e1;
+        font-size: 0.9rem;
+        line-height: 1.5rem;
+    }
 
-            .model-badge {
-                display: inline-block;
-                padding: 5px 10px;
-                border-radius: 20px;
-                font-size: 0.75rem;
-                font-weight: 600;
-            }
+    .model-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
 
-            .badge-lr { background: #38bdf8; color: #0d1b2a; }
-            .badge-svm { background: #facc15; color: #1e1e1e; }
+    .badge-lr   { background: #38bdf8; color: #0f172a; }
+    .badge-svm  { background: #facc15; color: #1f2937; }
+    .badge-tree { background: #4ade80; color: #022c22; }
+    .badge-rf   { background: #22c55e; color: #022c22; }
+    .badge-bag  { background: #a855f7; color: #f9fafb; }
+    .badge-boost{ background: #f97316; color: #111827; }
 
-            ul.model-points li {
-                color: #94a3b8;
-                margin-bottom: 6px;
-            }
-            .model-btn {
-            display: inline-block;
-            background: #3b82f6;
-            color: white !important;
-            padding: 10px 18px;
-            border-radius: 10px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: 0.25s ease;
-        }
-        .model-btn:hover {
-            background: #60a5fa;
-            transform: translateY(-3px);
-        }
+    ul.model-points {
+        padding-left: 18px;
+        margin-bottom: 10px;
+    }
+    ul.model-points li {
+        color: #94a3b8;
+        margin-bottom: 4px;
+        font-size: 0.85rem;
+    }
 
-        </style>
+    .model-btn {
+        display: inline-block;
+        background: #3b82f6;
+        color: white !important;
+        padding: 9px 16px;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: 0.25s ease;
+    }
+    .model-btn:hover {
+        background: #60a5fa;
+        transform: translateY(-3px);
+    }
 
-        <!-- LINEAR REGRESSION CARD -->
-        <div class="model-card mb-4">
-            <div class="model-title">
-                📈 Linear Regression
-                <span class="model-badge badge-lr">Regression Model</span>
-            </div>
+    .section-title {
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: #e5e7eb;
+        margin-bottom: 12px;
+    }
+    .section-sub {
+        font-size: 0.9rem;
+        color: #9ca3af;
+        margin-bottom: 20px;
+    }
+</style>
 
-            <p class="model-desc mt-2">
-                Linear Regression fits a straight line through data to estimate a continuous value.
-                This model is trained on ride-related features and predicts numerical output based
-                on patterns in the dataset.
-            </p>
-
-            <ul class="model-points">
-                <li>Predicts continuous numeric values</li>
-                <li>Simple, interpretable model</li>
-                <li>Uses scaled numeric inputs</li>
-                <li>Trained on your e-bike dataset</li>
-            </ul>
-
-            <a href="/predict" class="model-btn mt-2">🚀 Try Linear Regression</a>
-
-        </div>
-
-        <!-- SVM CARD -->
-        <div class="model-card mb-4">
-            <div class="model-title">
-                🤖 Support Vector Machines (SVM)
-                <span class="model-badge badge-svm">Classification Model</span>
-            </div>
-
-            <p class="model-desc mt-2">
-                SVM uses hyperplanes to classify data into different categories. This model supports
-                multiple kernels — Linear, Polynomial, and RBF — allowing flexible transformation of
-                your input space.
-            </p>
-
-            <ul class="model-points">
-                <li>Works with Linear, Polynomial, and RBF kernels</li>
-                <li>Ideal for complex decision boundaries</li>
-                <li>Trained on Study Hours & Attendance</li>
-                <li>Great performance on small/medium datasets</li>
-            </ul>
-
-            <a href="/predict_svm" class="model-btn mt-2">⚡ Try SVM Models</a>
-
-        </div>
-        <!-- DECISION TREE CARD -->
-<div class="model-card mb-4">
-    <div class="model-title">
-        🌳 Decision Tree
-        <span class="model-badge" style="background:#4ade80; color:#064e3b;">Classification / Regression</span>
-    </div>
-
-    <p class="model-desc mt-2">
-        Decision Trees split data into branches based on feature conditions, forming an intuitive
-        tree-like structure. They work well for both classification and regression tasks and are
-        easy to visualize and interpret.
+<div class="mb-3">
+    <div class="section-title">Choose a Model</div>
+    <p class="section-sub">
+        Experiment with different machine learning models on your datasets.
+        Use regression for battery predictions and classification models to
+        predict Pass / Fail based on study patterns.
     </p>
-
-    <ul class="model-points">
-        <li>Interpretable, tree-structured decisions</li>
-        <li>Handles both numeric & categorical data</li>
-        <li>Captures non-linear relationships</li>
-        <li>No feature scaling required</li>
-    </ul>
-
-    <a href="/predict_tree" class="model-btn mt-2" style="background:#4ade80; color:#064e3b !important;">
-        🌿 Try Decision Tree
-    </a>
 </div>
 
-        {% endblock %}
+<div class="model-grid">
+
+    <!-- Linear Regression -->
+    <div class="model-card">
+        <div class="model-title">
+            📈 Linear Regression
+            <span class="model-badge badge-lr">Regression</span>
+        </div>
+        <p class="model-desc mt-2">
+            Predict e-bike battery drop using ride features like distance,
+            speed, temperature, and rider weight.
+        </p>
+        <ul class="model-points">
+            <li>Predicts continuous numeric values (0–100% drop).</li>
+            <li>Trained on your e-bike dataset.</li>
+            <li>Visual donut chart for battery used vs remaining.</li>
+        </ul>
+        <a href="/predict" class="model-btn mt-1">🚀 Try Linear Regression</a>
+    </div>
+
+    <!-- SVM -->
+    <div class="model-card">
+        <div class="model-title">
+            🤖 Support Vector Machine
+            <span class="model-badge badge-svm">Classification</span>
+        </div>
+        <p class="model-desc mt-2">
+            Classify whether a student will Pass or Fail based on study hours
+            and attendance, with different kernels.
+        </p>
+        <ul class="model-points">
+            <li>Linear, Polynomial, and RBF kernels.</li>
+            <li>Great for complex decision boundaries.</li>
+            <li>Ideal for small to medium datasets.</li>
+        </ul>
+        <a href="/predict_svm" class="model-btn mt-1">⚡ Try SVM</a>
+    </div>
+
+    <!-- Decision Tree -->
+    <div class="model-card">
+        <div class="model-title">
+            🌳 Decision Tree
+            <span class="model-badge badge-tree">Classification</span>
+        </div>
+        <p class="model-desc mt-2">
+            A single interpretable tree with tunable depth and splitting
+            strategy. Great for understanding decision rules.
+        </p>
+        <ul class="model-points">
+            <li>Play with criterion, depth & min samples.</li>
+            <li>See accuracy and feature importance.</li>
+            <li>Pass / Fail prediction with explanation.</li>
+        </ul>
+        <a href="/predict_tree" class="model-btn mt-1">🌱 Explore Decision Tree</a>
+    </div>
+
+    <!-- Random Forest -->
+    <div class="model-card">
+        <div class="model-title">
+            🌲 Random Forest
+            <span class="model-badge badge-rf">Ensemble</span>
+        </div>
+        <p class="model-desc mt-2">
+            An ensemble of many trees voting together for a more stable and
+            often more accurate Pass / Fail prediction.
+        </p>
+        <ul class="model-points">
+            <li>Control number of trees and depth.</li>
+            <li>Reduced overfitting vs single tree.</li>
+            <li>Feature importance from the whole forest.</li>
+        </ul>
+        <a href="/predict_rf" class="model-btn mt-1">🌲 Try Random Forest</a>
+    </div>
+
+    <!-- Bagging -->
+    <div class="model-card">
+        <div class="model-title">
+            🎒 Bagging (Bootstrap Aggregating)
+            <span class="model-badge badge-bag">Ensemble</span>
+        </div>
+        <p class="model-desc mt-2">
+            Train multiple trees on different random samples and average their
+            predictions to reduce variance.
+        </p>
+        <ul class="model-points">
+            <li>Control max samples & features per tree.</li>
+            <li>Adjust base tree depth and min samples.</li>
+            <li>Good when a single tree overfits.</li>
+        </ul>
+        <a href="/predict_bagging" class="model-btn mt-1">🎒 Try Bagging</a>
+    </div>
+
+    <!-- Boosting -->
+    <div class="model-card">
+        <div class="model-title">
+            ⚡ AdaBoost (Boosting)
+            <span class="model-badge badge-boost">Ensemble</span>
+        </div>
+        <p class="model-desc mt-2">
+            Build a sequence of weak trees where each new tree focuses on the
+            mistakes of previous ones.
+        </p>
+        <ul class="model-points">
+            <li>Tune number of estimators & learning rate.</li>
+            <li>Uses a shallow decision tree as base learner.</li>
+            <li>Often very strong on tabular data.</li>
+        </ul>
+        <a href="/predict_boost" class="model-btn mt-1">⚡ Try Boosting</a>
+    </div>
+
+</div>
+
+{% endblock %}
